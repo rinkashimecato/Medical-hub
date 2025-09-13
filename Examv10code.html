@@ -1,0 +1,653 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>ExamBites</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<style>
+html, body {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  font-family: 'Segoe UI', Arial, sans-serif;
+  background: #f4f6f9;
+  min-height: 100vh;
+  width: 100vw;
+}
+body, #appRoot {
+  height: 100vh;
+  min-height: 100vh;
+  width: 100vw;
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+#appRoot {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+.header {
+  background: linear-gradient(90deg, #2563eb 60%, #60a5fa 100%);
+  color: #fff;
+  padding: 18px 36px;
+  font-size: 2rem;
+  letter-spacing: 2px;
+  font-weight: 700;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  min-height: 60px;
+  box-shadow: 0 2px 8px 0 rgba(37,99,235,0.04);
+}
+.header button {
+  background: #e74c3c;
+  color: #fff;
+  padding: 10px 22px;
+  border: none;
+  border-radius: 6px;
+  font-size: 1rem;
+  font-weight:600;
+  cursor: pointer;
+  box-shadow: 0 1px 2px rgba(0,0,0,.06);
+  transition: background 0.2s;
+}
+.header button:focus { outline: 2px solid #fff; }
+.header button:hover { background: #c0392b; }
+.main-content {
+  flex: 1 1 auto;
+  display: flex;
+  flex-direction: row;
+  gap: 2vw;
+  padding: 30px 3vw 30px 3vw;
+  box-sizing: border-box;
+  width: 100vw;
+  min-height: 0;
+}
+@media (max-width: 900px) {
+  .main-content { flex-direction: column; gap: 24px; padding: 18px 2vw;}
+}
+.sidebar {
+  min-width: 240px;
+  max-width: 350px;
+  background: linear-gradient(120deg, #e0eaff 70%, #f0f7ff 100%);
+  border-radius: 18px;
+  padding: 28px 18px 28px 20px;
+  box-shadow: 0 4px 16px rgba(37,99,235,0.05);
+  height: fit-content;
+  overflow-y: auto;
+  max-height: 80vh;
+  transition: opacity 0.3s, visibility 0.3s;
+  border:1px solid #c7d9ee;
+}
+.sidebar.hidden { opacity: 0; visibility: hidden; pointer-events: none; width: 0; min-width: 0; max-width: 0; padding: 0; }
+@media (max-width: 900px) {
+  .sidebar { width: 100%; max-width: unset; min-width: unset; }
+}
+.content-area {
+  flex: 1 1 0;
+  background: #fff;
+  border-radius: 18px;
+  min-width: 0;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.10);
+  padding: 40px 42px;
+  overflow-y: auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 420px;
+  transition: box-shadow 0.2s;
+}
+@media (max-width: 900px) {
+  .content-area { padding: 18px 3vw;}
+}
+.card-center {
+  margin: 0 auto;
+  background: #fff;
+  border-radius: 16px;
+  box-shadow: 0 4px 16px rgba(37,99,235,0.07);
+  max-width: 440px;
+  width: 100%;
+  padding: 38px 32px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  animation: fadeIn 0.7s;
+}
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(30px);}
+  to { opacity: 1; transform: none;}
+}
+.card-center h2, .card-center h3 { text-align:center; color:#2563eb; margin-top:0; font-weight:700;}
+.card-center p { text-align:justify; color:#334155;}
+.card-center input, .card-center button, .card-center select, .card-center textarea {
+  width:100%; padding:12px; margin:10px 0; border:1px solid #c7d9ee; border-radius:9px; font-size:17px;
+  box-sizing: border-box;
+}
+.card-center button { background:#3498db; color:white; border:none; cursor:pointer; font-weight:600;}
+.card-center button:focus { outline: 2px solid #2563eb; }
+.card-center button:hover { background:#2563eb; }
+.card-center button.small { font-size:14px; padding:4px 14px; margin-top:0; margin-bottom:0;}
+.card-center .logout-btn { background:#e74c3c; }
+.card-center .logout-btn:hover { background:#c0392b; }
+.card-center .flex-row { display:flex; align-items:center; }
+.card-center .flex-row input[type="password"], .card-center .flex-row input[type="text"] { flex:1; }
+.card-center .flex-row button { width:auto; margin-left:6px;}
+.card-center textarea { height:80px; }
+.admin-control-row {display:flex;gap:10px;justify-content:center;margin:16px 0;}
+.file-card {
+  background: #f8fafd;
+  border: 1.5px solid #dbeafe;
+  border-radius: 12px;
+  box-shadow: 0 2px 10px rgba(52,152,219,0.09);
+  padding: 18px 18px;
+  margin: 18px 0;
+  font-size: 13px;
+  color: #22334a;
+  transition: box-shadow 0.2s;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  animation: fadeIn 0.5s;
+}
+.file-card-title {
+  font-weight: bold;
+  margin-bottom: 8px;
+  color: #2563eb;
+  font-size: 16px;
+}
+.file-card-content {
+  font-size: 13px;
+  color: #22334a;
+  word-break: break-word;
+  white-space: pre-wrap;
+  background: #f1f8ff;
+  border-radius: 8px;
+  padding: 10px 12px;
+  margin-bottom: 8px;
+}
+.file-card-btn-row {
+  display: flex;
+  gap: 12px;
+  justify-content: flex-end;
+}
+.file-card button {
+  font-size: 13px;
+  padding: 5px 18px;
+  margin: 0;
+  border-radius: 7px;
+  background: #93c5fd;
+  color: #1e3a8a;
+  border: none;
+  cursor: pointer;
+  font-weight:600;
+  transition: background 0.18s;
+}
+.file-card button:focus { outline: 2px solid #2563eb; }
+.file-card button:hover {
+  background: #60a5fa;
+}
+.menu, .sidebar .menu {
+  margin: 10px 0;
+  padding: 12px;
+  background: #ecf0f1;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 1rem;
+  font-weight: 500;
+  outline: none;
+  transition: background 0.18s;
+  box-shadow: 0 1px 3px rgba(37,99,235,0.03);
+}
+.menu:focus, .sidebar .menu:focus { box-shadow: 0 0 0 2px #2563eb; }
+.menu:hover, .sidebar .menu:hover { background: #dbeafe; }
+.active-file {
+  background: #bcdffb !important;
+  color: #1e40af !important;
+}
+::-webkit-scrollbar { width: 8px; background: #e0eaff; }
+::-webkit-scrollbar-thumb { background: #c7d9ee; border-radius: 6px; }
+.admin-file-list {
+  margin: 0 0 18px 0;
+  padding: 0;
+  list-style: none;
+}
+.admin-file-list li {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: #f3f6fa;
+  margin: 2px 0;
+  border-radius: 7px;
+  padding: 7px 12px;
+  font-size: 15px;
+  font-weight: 500;
+}
+.admin-file-list button {
+  background: #e74c3c;
+  color: #fff;
+  font-size: 13px;
+  border: none;
+  border-radius: 6px;
+  padding: 3px 13px;
+  margin-left: 12px;
+  cursor: pointer;
+  font-weight: bold;
+  transition: background 0.18s;
+}
+.admin-file-list button:hover { background: #c0392b; }
+</style>
+</head>
+<body>
+<div id="appRoot">
+  <div class="header">
+    <span>ExamBites 🎓</span>
+    <button id="logoutBtn" style="display:none;" onclick="logout()">Logout</button>
+  </div>
+  <div class="main-content">
+    <nav class="sidebar hidden" id="sidebarNav" aria-label="Sidebar navigation"></nav>
+    <div class="content-area" id="mainContent"></div>
+  </div>
+</div>
+<script>
+// General utility
+function getSlides(course) {
+  return (JSON.parse(localStorage.getItem("adminSlides")||"[]")||[]).filter(s=>s.course===course);
+}
+function getPapers(course) {
+  return (JSON.parse(localStorage.getItem("adminPapers")||"[]")||[]).filter(p=>p.course===course);
+}
+// Sidebar
+function renderSidebar() {
+  const sidebar = document.getElementById("sidebarNav");
+  sidebar.innerHTML = "";
+  sidebar.setAttribute("aria-label", "Sidebar navigation");
+  sidebar.setAttribute("role", "navigation");
+  sidebar.tabIndex = 0;
+  sidebar.style.outline = "none";
+  // Past Papers
+  sidebar.appendChild(makeMenuTitle("📂 Past Papers"));
+  ["Medicine","Surgery","Pediatrics","ObsGyn","Psychiatry"].forEach(course=>{
+    const sect = document.createElement("div");
+    sect.className = "menu";
+    sect.textContent = course === "ObsGyn" ? "Obs & Gyn" : course;
+    sidebar.appendChild(sect);
+    (getPapers(course) || []).forEach(paper=>{
+      const f = document.createElement("div");
+      f.className = "menu";
+      f.style.marginLeft = "20px";
+      f.style.fontSize = "0.97rem";
+      f.textContent = paper.title;
+      f.tabIndex = 0;
+      f.setAttribute("role","button");
+      f.setAttribute("aria-label",paper.title + " " + sect.textContent);
+      f.onclick = ()=>{ showPaperCard(course, paper.title); highlightSidebarFile(f); };
+      f.onkeydown = (e)=>{ if (e.key === "Enter" || e.key === " ") { f.click(); } };
+      sidebar.appendChild(f);
+    });
+  });
+  // Brief Notes
+  sidebar.appendChild(makeMenuTitle("📘 Brief Notes"));
+  ["Medicine","Surgery","Pediatrics","ObsGyn","Psychiatry"].forEach(course=>{
+    const sect = document.createElement("div");
+    sect.className = "menu";
+    sect.textContent = course === "ObsGyn" ? "Obs & Gyn" : course;
+    sidebar.appendChild(sect);
+    (getSlides(course) || []).forEach(slide=>{
+      const f = document.createElement("div");
+      f.className = "menu";
+      f.style.marginLeft = "20px";
+      f.style.fontSize = "0.97rem";
+      f.textContent = slide.title;
+      f.tabIndex = 0;
+      f.setAttribute("role","button");
+      f.setAttribute("aria-label",slide.title + " " + sect.textContent);
+      f.onclick = ()=>{ showSlideCard(course, slide.title); highlightSidebarFile(f); };
+      f.onkeydown = (e)=>{ if (e.key === "Enter" || e.key === " ") { f.click(); } };
+      sidebar.appendChild(f);
+    });
+  });
+  // Admin button for shortcut
+  if(localStorage.getItem("isAdmin")==="1") {
+    const adm = document.createElement("div");
+    adm.className = "menu";
+    adm.textContent = "⚙️ Admin Panel";
+    adm.style.background = "#f7d7d7";
+    adm.onclick = ()=>goToAdminPanel();
+    adm.tabIndex = 0;
+    adm.setAttribute("role","button");
+    adm.setAttribute("aria-label","Admin Panel");
+    sidebar.appendChild(adm);
+  }
+}
+function makeMenuTitle(txt) {
+  const div = document.createElement("div");
+  div.className = "menu";
+  div.style.background = "#dbeafe";
+  div.style.fontSize = "1.08rem";
+  div.style.cursor = "default";
+  div.style.fontWeight = "bold";
+  div.textContent = txt;
+  div.tabIndex = -1;
+  return div;
+}
+function highlightSidebarFile(fileDiv) {
+  document.querySelectorAll('.sidebar .menu.active-file').forEach(e=>e.classList.remove("active-file"));
+  if(fileDiv) fileDiv.classList.add("active-file");
+}
+function showContent(html, centerCard=false){
+  const main = document.getElementById("mainContent");
+  if (!main) { console.error("No #mainContent found!"); return; }
+  main.innerHTML = centerCard ? `<div class="card-center">${html}</div>` : html;
+}
+function showSidebar(show=true) {
+  const sidebar = document.getElementById("sidebarNav");
+  sidebar.classList.toggle("hidden", !show);
+}
+function showLogout(show=true) {
+  document.getElementById("logoutBtn").style.display = show ? "" : "none";
+}
+function goToWelcome(){
+  showSidebar(false);
+  showLogout(false);
+  showContent(`
+    <h2>Welcome to ExamBites 🎓</h2>
+    <p>
+      ExamBites provides <b>clinical notes and past papers</b> for medical students from <b>4th–6th year</b>.<br>
+      Access organized notes, theory questions, OSCE stations, MCQs, and scenario questions across:    
+      <b>Medicine, Surgery, Pediatrics, Obs & Gyn, Psychiatry</b>.
+    </p>
+    <button onclick="goToRegister()">I’m Interested</button>
+    <button onclick="goToLogin()">Sign In</button>
+  `, true);
+  highlightSidebarFile(null);
+}
+function goToRegister(){
+  if (appStopped) { alert("The application is stopped by admin."); return; }
+  showSidebar(false);
+  showLogout(false);
+  showContent(`
+    <h2>Register for Access</h2>
+    <input type="email" id="regEmail" placeholder="Enter your email" autocomplete="email">
+    <input type="tel" id="regNumber" placeholder="Enter your mobile number" autocomplete="tel">
+    <div class="flex-row">
+      <input type="password" id="regPassword" placeholder="Create a password" autocomplete="new-password">
+      <button class="small" type="button" onclick="togglePassword('regPassword', this)" title="Show/Hide password">👁️</button>
+    </div>
+    <button onclick="finishRegister()">Register</button>
+    <button class="logout-btn" onclick="goToWelcome()">Back</button>
+    <p id="regError" style="color:red; text-align:center;"></p>
+  `, true);
+  document.getElementById("regEmail").focus();
+  ["regEmail","regNumber","regPassword"].forEach(id=>{
+    document.getElementById(id).addEventListener('input',()=>document.getElementById("regError").innerText="");
+  });
+}
+function goToLogin(){
+  if (appStopped) { alert("The application is stopped by admin."); return; }
+  showSidebar(false);
+  showLogout(false);
+  showContent(`
+    <h2>Subscriber Login</h2>
+    <input type="email" id="loginEmail" placeholder="Enter your email" autocomplete="email">
+    <div class="flex-row">
+      <input type="password" id="loginPassword" placeholder="Enter your password" autocomplete="current-password">
+      <button class="small" type="button" onclick="togglePassword('loginPassword', this)" title="Show/Hide password">👁️</button>
+    </div>
+    <button onclick="loginSubscriber()">Login</button>
+    <button class="logout-btn" onclick="goToWelcome()">Back</button>
+    <p id="loginError" style="color:red; text-align:center;"></p>
+  `, true);
+  document.getElementById("loginEmail").focus();
+  ["loginEmail","loginPassword"].forEach(id=>{
+    document.getElementById(id).addEventListener('input',()=>document.getElementById("loginError").innerText="");
+  });
+}
+function logout(){
+  localStorage.removeItem("isAdmin");
+  goToWelcome();
+  highlightSidebarFile(null);
+}
+function finishRegister(){
+  if (appStopped) { alert("The application is stopped by admin."); return; }
+  const email=document.getElementById("regEmail").value.trim();
+  const number=document.getElementById("regNumber").value.trim();
+  const password=document.getElementById("regPassword").value.trim();
+  const err = document.getElementById("regError");
+  err.innerText = "";
+  if(!/^[\w\.-]+@[\w\.-]+\.[a-z]{2,}$/i.test(email)){
+    err.innerText = "Invalid email format."; return;
+  }
+  if(number.length < 7){
+    err.innerText = "Phone number too short."; return;
+  }
+  if(password.length<5){
+    err.innerText = "Password too short."; return;
+  }
+  localStorage.setItem("examEmail",email);
+  localStorage.setItem("examNumber",number);
+  localStorage.setItem("examPassword",password);
+  goToAppPage();
+}
+function loginSubscriber(){
+  if (appStopped) { alert("The application is stopped by admin."); return; }
+  const email=document.getElementById("loginEmail").value.trim();
+  const password=document.getElementById("loginPassword").value.trim();
+  document.getElementById("loginError").innerText="";
+  // Hidden admin shortcut
+  if(email==="rinkashimecato@gmail.com" && password==="caTo1234"){
+    localStorage.setItem("isAdmin","1");
+    goToAdminPanel();
+    return;
+  }
+  // Normal subscriber login
+  const storedEmail=localStorage.getItem("examEmail");
+  const storedPassword=localStorage.getItem("examPassword");
+  if(email===storedEmail && password===storedPassword){
+    localStorage.removeItem("isAdmin");
+    goToAppPage();
+  } else {
+    document.getElementById("loginError").innerText="Invalid email or password.";
+  }
+}
+function goToAppPage(){
+  showSidebar(true);
+  showLogout(true);
+  renderSidebar();
+  showContent(`
+    <h2>Welcome to ExamBites 🎓</h2>
+    <p>Explore the menu on the left to view past papers and brief notes.</p>
+  `, true);
+  highlightSidebarFile(null);
+}
+function goToAdminPanel(){
+  showSidebar(true);
+  showLogout(true);
+  renderSidebar();
+  // List of uploaded slides/papers for admin (in panel, not in sidebar)
+  const slides = JSON.parse(localStorage.getItem("adminSlides")||"[]");
+  const papers = JSON.parse(localStorage.getItem("adminPapers")||"[]");
+  let slidesList = '<ul class="admin-file-list" id="adminSlidesList">';
+  slides.forEach((s,idx)=>{
+    slidesList += `<li>
+      <span>${s.course} - ${s.title}</span>
+      <button onclick="deleteAdminSlide(${idx})" title="Delete">&#128465;</button>
+    </li>`;
+  });
+  slidesList += '</ul>';
+  let papersList = '<ul class="admin-file-list" id="adminPapersList">';
+  papers.forEach((p,idx)=>{
+    papersList += `<li>
+      <span>${p.course} - ${p.title}</span>
+      <button onclick="deleteAdminPaper(${idx})" title="Delete">&#128465;</button>
+    </li>`;
+  });
+  papersList += '</ul>';
+  showContent(`
+    <div style="display:flex;justify-content:space-between;align-items:center;">
+      <h2 style="margin-bottom:0;">Admin Panel</h2>
+      <button class="logout-btn" style="width:auto;" onclick="logout()">Logout</button>
+    </div>
+    <div class="admin-control-row">
+      <button onclick="stopApp()" style="background:#e74c3c;">Stop App</button>
+      <button onclick="startApp()" style="background:#27ae60;">Start App</button>
+    </div>
+    <h3>Upload Slides for Brief Notes</h3>
+    <form id="adminSlidesForm" autocomplete="off">
+      <select id="slideCourse" required>
+        <option value="">Select course</option>
+        <option value="Medicine">Medicine</option>
+        <option value="Surgery">Surgery</option>
+        <option value="Pediatrics">Pediatrics</option>
+        <option value="ObsGyn">Obs & Gyn</option>
+        <option value="Psychiatry">Psychiatry</option>
+      </select>
+      <input type="text" id="slideTitle" placeholder="Topic title" required>
+      <textarea id="slidePage1" placeholder="Page 1" required></textarea>
+      <textarea id="slidePage2" placeholder="Page 2" required></textarea>
+      <textarea id="slidePage3" placeholder="Page 3" required></textarea>
+      <textarea id="slidePage4" placeholder="Page 4" required></textarea>
+      <textarea id="slidePage5" placeholder="Page 5" required></textarea>
+      <button type="submit">Upload Slides</button>
+    </form>
+    <h3>Uploaded Slides</h3>
+    ${slidesList}
+    <hr>
+    <h3>Upload Past Paper (max 500 MCQs, read-only)</h3>
+    <form id="adminPapersForm" autocomplete="off">
+      <select id="paperCourse" required>
+        <option value="">Select course</option>
+        <option value="Medicine">Medicine</option>
+        <option value="Surgery">Surgery</option>
+        <option value="Pediatrics">Pediatrics</option>
+        <option value="ObsGyn">Obs & Gyn</option>
+        <option value="Psychiatry">Psychiatry</option>
+      </select>
+      <input type="text" id="paperTitle" placeholder="Paper Title" required>
+      <textarea id="paperContent" placeholder="Paste up to 500 MCQs here" required></textarea>
+      <button type="submit">Upload Past Paper</button>
+    </form>
+    <h3>Uploaded Past Papers</h3>
+    ${papersList}
+  `);
+  // Attach form handlers for seamless upload
+  document.getElementById('adminSlidesForm').onsubmit = function(e){
+    e.preventDefault();
+    adminUploadSlides();
+    return false;
+  };
+  document.getElementById('adminPapersForm').onsubmit = function(e){
+    e.preventDefault();
+    adminUploadPapers();
+    return false;
+  };
+}
+function adminUploadSlides(){
+  if (appStopped) { alert("The application is stopped by admin."); return; }
+  const course=document.getElementById("slideCourse").value;
+  const title=document.getElementById("slideTitle").value.trim();
+  const pages=[
+    document.getElementById("slidePage1").value,
+    document.getElementById("slidePage2").value,
+    document.getElementById("slidePage3").value,
+    document.getElementById("slidePage4").value,
+    document.getElementById("slidePage5").value
+  ];
+  if(!course || !title || pages.some(p=>!p)){alert("Please enter course, title and all 5 pages."); return;}
+  let slides=JSON.parse(localStorage.getItem("adminSlides")||"[]");
+  if(slides.some(s=>s.course===course && s.title.toLowerCase()===title.toLowerCase())){
+    alert("Duplicate topic for this course."); return;
+  }
+  slides.push({course,title,pages});
+  localStorage.setItem("adminSlides",JSON.stringify(slides));
+  alert("Slides uploaded successfully!");
+  goToAdminPanel();
+  renderSidebar();
+}
+function adminUploadPapers(){
+  if (appStopped) { alert("The application is stopped by admin."); return; }
+  const course=document.getElementById("paperCourse").value;
+  const title=document.getElementById("paperTitle").value.trim();
+  const content=document.getElementById("paperContent").value.trim();
+  if(!course || !title || !content){alert("Fill course, title and content."); return;}
+  if(content.split("\n").length>500){alert("Max 500 MCQs allowed."); return;}
+  let papers=JSON.parse(localStorage.getItem("adminPapers")||"[]");
+  if(papers.some(p=>p.course===course && p.title.toLowerCase()===title.toLowerCase())){
+    alert("Duplicate paper title for this course."); return;
+  }
+  papers.push({course,title,content});
+  localStorage.setItem("adminPapers",JSON.stringify(papers));
+  alert("Past Paper uploaded successfully!");
+  goToAdminPanel();
+  renderSidebar();
+}
+function deleteAdminSlide(idx){
+  if (appStopped) { alert("The application is stopped by admin."); return; }
+  let slides=JSON.parse(localStorage.getItem("adminSlides")||"[]");
+  if(!confirm(`Delete slide: ${slides[idx].title}?`)) return;
+  slides.splice(idx,1);
+  localStorage.setItem("adminSlides",JSON.stringify(slides));
+  goToAdminPanel();
+  renderSidebar();
+}
+function deleteAdminPaper(idx){
+  if (appStopped) { alert("The application is stopped by admin."); return; }
+  let papers=JSON.parse(localStorage.getItem("adminPapers")||"[]");
+  if(!confirm(`Delete paper: ${papers[idx].title}?`)) return;
+  papers.splice(idx,1);
+  localStorage.setItem("adminPapers",JSON.stringify(papers));
+  goToAdminPanel();
+  renderSidebar();
+}
+function showSlideCard(course, title) {
+  const slides = getSlides(course);
+  const found = slides.find(s => s.title === title);
+  if (!found) return;
+  let currentPage = 0;
+  function renderPage() {
+    document.getElementById("mainContent").innerHTML = `
+      <div class="file-card" tabindex="0" aria-label="${found.title} slides">
+        <div class="file-card-title">${found.title}</div>
+        <div class="file-card-content" id="slidePageContent">${found.pages[currentPage]}</div>
+        <div class="file-card-btn-row">
+          <button ${currentPage===0?"disabled":""} onclick="window.changeSlidePage(-1)">Prev</button>
+          <span>Page ${currentPage+1} of ${found.pages.length}</span>
+          <button ${currentPage===found.pages.length-1?"disabled":""} onclick="window.changeSlidePage(1)">Next</button>
+        </div>
+      </div>
+    `;
+    window.changeSlidePage = function(dir) {
+      if ((dir === -1 && currentPage > 0) || (dir === 1 && currentPage < found.pages.length - 1)) {
+        currentPage += dir;
+        renderPage();
+      }
+    };
+  }
+  renderPage();
+}
+function showPaperCard(course, title) {
+  const papers = getPapers(course);
+  const found = papers.find(p => p.title === title);
+  if (!found) return;
+  document.getElementById("mainContent").innerHTML = `
+    <div class="file-card" tabindex="0" aria-label="${found.title} paper">
+      <div class="file-card-title">${found.title}</div>
+      <div class="file-card-content">${found.content.replace(/\n/g, "<br>")}</div>
+    </div>
+  `;
+}
+function togglePassword(fieldId, btn) {
+  const field = document.getElementById(fieldId);
+  field.type = field.type === "password" ? "text" : "password";
+  btn.innerText = field.type === "password" ? "👁️" : "🙈";
+}
+let appStopped = false;
+function stopApp() { appStopped = true; alert("The application has been stopped. All functions are disabled."); }
+function startApp() { appStopped = false; alert("The application is now active."); }
+document.addEventListener("DOMContentLoaded", function() {
+  goToWelcome();
+  renderSidebar();
+});
+</script>
+</body>
+</html>
